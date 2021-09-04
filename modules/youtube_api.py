@@ -1,6 +1,18 @@
-from typing import Iterator, Tuple
+from typing import Iterator, Tuple, List, TypedDict
 
 from apiclient.discovery import build
+
+from .util import delete_unused_char_for_dir_name
+
+
+class Thumbnail(TypedDict):
+    title: str
+    thumbnail_url: str
+
+
+class ThumbnailList(TypedDict):
+    title: str
+    videos: List[Thumbnail]
 
 
 class YoutubeAPIUtil:
@@ -55,7 +67,18 @@ class YoutubeAPIUtil:
                 id_ = item["id"]["playlistId"]
                 yield (title, id_)
 
-    def _fetch_playlist_items(self, playlist_id, next_token=""):
+    def _fetch_playlist_items(
+        self, playlist_id: str, next_token: str = ""
+    ) -> Tuple[str, List[Thumbnail]]:
+        """プレイリスト内の動画サムネイルを取得
+
+        Args:
+            playlist_id (str): プレイリストID
+            next_token (str): YouTubeAPI 次ページ取得トークン
+
+        Returns:
+            Tuple[str, List[Thumbnail]]: 次ページ取得トークン, [動画タイトル, サムネイルURL]
+        """
         with build("youtube", "v3", developerKey=self.youtube_api_key) as youbute:
             search_response = (
                 youbute.playlistItems()
@@ -78,7 +101,15 @@ class YoutubeAPIUtil:
 
             return next_token, videos
 
-    def generate_thumbnail_list(self, playlist_info):
+    def generate_thumbnail_list(self, playlist_info: Tuple[str, str]) -> ThumbnailList:
+        """プレイリスト内の動画サムネイルリストを作成
+
+        Args:
+            playlist_info (Tuple[str, str]): プレイリストタイトル, プレイリストID
+
+        Returns:
+            ThumbnailList: [description]
+        """
         playlist_title, playlist_id = playlist_info
 
         playlist = {
@@ -95,4 +126,4 @@ class YoutubeAPIUtil:
 
         playlist["videos"] = videos
 
-            return {"playlist": playlist}
+        return playlist
