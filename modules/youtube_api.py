@@ -54,3 +54,31 @@ class YoutubeAPIUtil:
                 title = item["snippet"]["title"]
                 id_ = item["id"]["playlistId"]
                 yield (title, id_)
+
+    def generate_thumbnail_list(self, playlist_info):
+        playlist_title, playlist_id = playlist_info
+
+        with build("youtube", "v3", developerKey=self.youtube_api_key) as youbute:
+            search_response = (
+                youbute.playlistItems()
+                .list(
+                    part="snippet",
+                    playlistId=playlist_id,
+                )
+                .execute()
+            )
+
+            playlist = {
+                "title": playlist_title,
+                "videos": [
+                    {
+                        "title": video["snippet"]["title"],
+                        "thumbnail_url": video["snippet"]["thumbnails"]["standard"][
+                            "url"
+                        ],
+                    }
+                    for video in search_response["items"]
+                ],
+            }
+
+            return {"playlist": playlist}
