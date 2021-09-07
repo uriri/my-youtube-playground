@@ -20,8 +20,6 @@ def delete_unused_char_for_dir_name(origin_str: str) -> str:
                 ":": "_",
                 "：": "_",
                 "*": "_",
-                "?": "_",
-                "？": "_",
                 '"': "_",
                 ">": "_",
                 "<": "_",
