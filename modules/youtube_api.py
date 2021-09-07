@@ -90,11 +90,11 @@ class YoutubeAPIUtil:
 
             next_token = search_response.get("nextPageToken")
             videos = [
-                    {
-                        "title": video["snippet"]["title"],
+                {
+                    "title": video["snippet"]["title"],
                     "thumbnail_url": video["snippet"]["thumbnails"]["standard"]["url"],
-                    }
-                    for video in search_response["items"]
+                }
+                for video in search_response["items"]
             ]
 
             return next_token, videos
@@ -112,7 +112,7 @@ class YoutubeAPIUtil:
 
         playlist = {
             "title": playlist_title,
-            }
+        }
         next_token, videos = self._fetch_playlist_items(playlist_id)
 
         while True:
