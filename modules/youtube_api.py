@@ -2,8 +2,6 @@ from typing import Iterator, Tuple, List, TypedDict
 
 from apiclient.discovery import build
 
-from .util import delete_unused_char_for_dir_name
-
 
 class Thumbnail(TypedDict):
     title: str
