@@ -1,6 +1,11 @@
-from typing import Iterator, Tuple, List, TypedDict
+from typing import Iterator, Tuple, List, TypedDict, NamedTuple
 
 from apiclient.discovery import build
+
+
+class Playlist(NamedTuple):
+    title: str
+    id_: str
 
 
 class Thumbnail(TypedDict):
@@ -38,14 +43,14 @@ class YoutubeAPIUtil:
                     id_ = item["snippet"]["channelId"]
                     return id_
 
-    def get_playlists_on_channel(self, channel_id: str) -> Iterator[Tuple[str, str]]:
+    def get_playlists_on_channel(self, channel_id: str) -> Iterator[Playlist]:
         """チャンネルに存在するプレイリスト（再生回数上位5つ）を取得
 
         Args:
             channel_id (str): チャンネルID
 
         Yields:
-            Iterator[Tuple[str, str]]: (プレイリストタイトル, プレイリストID)
+            Iterator[Playlist]: (プレイリストタイトル, プレイリストID)
         """
 
         with build("youtube", "v3", developerKey=self.youtube_api_key) as youbute:
@@ -63,7 +68,7 @@ class YoutubeAPIUtil:
             for item in search_response["items"]:
                 title = item["snippet"]["title"]
                 id_ = item["id"]["playlistId"]
-                yield (title, id_)
+                yield Playlist(title=title, id_=id_)
 
     def _fetch_playlist_items(
         self, playlist_id: str, next_token: str = ""
@@ -99,29 +104,26 @@ class YoutubeAPIUtil:
 
             return next_token, videos
 
-    def generate_thumbnail_list(self, playlist_info: Tuple[str, str]) -> ThumbnailList:
+    def generate_thumbnail_list(self, playlist: Playlist) -> ThumbnailList:
         """プレイリスト内の動画サムネイルリストを作成
 
         Args:
-            playlist_info (Tuple[str, str]): プレイリストタイトル, プレイリストID
+            playlist (Playlist): プレイリストタイトル, プレイリストID
 
         Returns:
-            ThumbnailList: [description]
+            ThumbnailList: プレイリスト内の動画サムネイルリスト
         """
-        playlist_title, playlist_id = playlist_info
-
-        playlist = {
-            "title": playlist_title,
-        }
-        next_token, videos = self._fetch_playlist_items(playlist_id)
+        next_token, videos = self._fetch_playlist_items(playlist.id_)
 
         while True:
             if next_token is None:
                 break
 
-            next_token, tmp_videos = self._fetch_playlist_items(playlist_id, next_token)
+            next_token, tmp_videos = self._fetch_playlist_items(
+                playlist.id_, next_token
+            )
             videos.extend(tmp_videos)
 
-        playlist["videos"] = videos
+        thumbnail_list: ThumbnailList = {"title": playlist.title, "videos": videos}
 
-        return playlist
+        return thumbnail_list
