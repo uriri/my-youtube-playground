@@ -22,6 +22,21 @@ class YoutubeAPIUtil:
     def __init__(self, api_key):
         self.youtube_api_key = api_key
 
+    def _get_resource_from_api(self, resource):
+        with build("youtube", "v3", developerKey=self.youtube_api_key) as youbute:
+            if resource["mode"] == "get_channel_id":
+                search_response = (
+                    youbute.search()
+                    .list(
+                        part="snippet",
+                        q=resource["channel_name"],
+                        type="channel",
+                        maxResults=2,
+                    )
+                    .execute()
+                )
+        return search_response
+
     def get_channel_id_from_channel_name(self, channel_name: str) -> str:
         """チャンネル名からチャンネルIDを取得する
 
@@ -31,20 +46,48 @@ class YoutubeAPIUtil:
         Returns:
             str: チャンネルID
         """
-        with build("youtube", "v3", developerKey=self.youtube_api_key) as youbute:
-            search_response = (
-                youbute.search()
-                .list(part="snippet", q=channel_name, type="channel", maxResults=2)
-                .execute()
-            )
-            for item in search_response["items"]:
-                title = item["snippet"]["title"]
-                if title == channel_name:
-                    id_ = item["snippet"]["channelId"]
-                    return id_
+        resource = {"mode": "get_channel_id", "channel_name": channel_name}
+        search_response = self._get_resource_from_api(resource)
+        for item in search_response["items"]:
+            title = item["snippet"]["title"]
+            if title == channel_name:
+                id_ = item["snippet"]["channelId"]
+                return id_
 
     def get_playlists_on_channel(self, channel_id: str) -> Iterator[Playlist]:
         """チャンネルに存在するプレイリスト（再生回数上位5つ）を取得
+
+        Args:
+            channel_id (str): チャンネルID
+
+        Yields:
+            Iterator[Playlist]: (プレイリストタイトル, プレイリストID)
+        """
+
+        with build("youtube", "v3", developerKey=self.youtube_api_key) as youbute:
+            search_response = (
+                youbute.search()
+                .list(
+                    part="snippet",
+                    channelId=channel_id,
+                    type="playlist",
+                    order="videoCount",
+                )
+                .execute()
+            )
+
+            for item in search_response["items"]:
+                title = item["snippet"]["title"]
+                id_ = item["id"]["playlistId"]
+                yield Playlist(title=title, id_=id_)
+
+    def _fetch_playlists(self):
+        pass
+
+    def generatet_playlists_thumbnail_list_on_channel(
+        self, channel_id: str
+    ) -> ThumbnailList:
+        """チャンネルに存在するプレイリストのサムネイルリストを作成
 
         Args:
             channel_id (str): チャンネルID
