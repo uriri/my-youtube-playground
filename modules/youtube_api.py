@@ -35,6 +35,28 @@ class YoutubeAPIUtil:
                     )
                     .execute()
                 )
+            elif resource["mode"] == "get_playlists_on_channel":
+                search_response = (
+                    youbute.search()
+                    .list(
+                        part="snippet",
+                        channelId=resource["channel_id"],
+                        type="playlist",
+                        order="videoCount",
+                        pageToken=resource["next_token"],
+                    )
+                    .execute()
+                )
+            elif resource["mode"] == "generate_thumbnail_list":
+                search_response = (
+                    youbute.playlistItems()
+                    .list(
+                        part="snippet",
+                        playlistId=resource["playlist_id"],
+                        pageToken=resource["next_token"],
+                    )
+                    .execute()
+                )
         return search_response
 
     def get_channel_id_from_channel_name(self, channel_name: str) -> str:
@@ -66,26 +88,20 @@ class YoutubeAPIUtil:
         Returns:
             Tuple[str, List[Playlist]]: 次ページ取得トークン, プレイリスト[タイトル, ID]
         """
-        with build("youtube", "v3", developerKey=self.youtube_api_key) as youbute:
-            search_response = (
-                youbute.search()
-                .list(
-                    part="snippet",
-                    channelId=channel_id,
-                    type="playlist",
-                    order="videoCount",
-                    pageToken=next_token,
-                )
-                .execute()
-            )
+        resource = {
+            "mode": "get_playlists_on_channel",
+            "channel_id": channel_id,
+            "next_token": next_token,
+        }
+        search_response = self._get_resource_from_api(resource)
 
-            next_token = search_response.get("nextPageToken")
-            playlists = [
-                Playlist(title=item["snippet"]["title"], id_=item["id"]["playlistId"])
-                for item in search_response["items"]
-            ]
+        next_token = search_response.get("nextPageToken")
+        playlists = [
+            Playlist(title=item["snippet"]["title"], id_=item["id"]["playlistId"])
+            for item in search_response["items"]
+        ]
 
-            return next_token, playlists
+        return next_token, playlists
 
     def get_playlists_on_channel(self, channel_id: str) -> Iterator[Playlist]:
         """チャンネルに存在するプレイリスト（再生回数上位5つ）を取得
@@ -122,27 +138,23 @@ class YoutubeAPIUtil:
         Returns:
             Tuple[str, List[Thumbnail]]: 次ページ取得トークン, [動画タイトル, サムネイルURL]
         """
-        with build("youtube", "v3", developerKey=self.youtube_api_key) as youbute:
-            search_response = (
-                youbute.playlistItems()
-                .list(
-                    part="snippet",
-                    playlistId=playlist_id,
-                    pageToken=next_token,
-                )
-                .execute()
-            )
+        resource = {
+            "mode": "generate_thumbnail_list",
+            "playlist_id": playlist_id,
+            "next_token": next_token,
+        }
+        search_response = self._get_resource_from_api(resource)
 
-            next_token = search_response.get("nextPageToken")
-            videos = [
-                {
-                    "title": video["snippet"]["title"],
-                    "thumbnail_url": video["snippet"]["thumbnails"]["standard"]["url"],
-                }
-                for video in search_response["items"]
-            ]
+        next_token = search_response.get("nextPageToken")
+        videos = [
+            {
+                "title": video["snippet"]["title"],
+                "thumbnail_url": video["snippet"]["thumbnails"]["standard"]["url"],
+            }
+            for video in search_response["items"]
+        ]
 
-            return next_token, videos
+        return next_token, videos
 
     def generate_thumbnail_list(self, playlist: Playlist) -> ThumbnailList:
         """プレイリスト内の動画サムネイルリストを作成
