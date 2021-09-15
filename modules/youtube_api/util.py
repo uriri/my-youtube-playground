@@ -1,63 +1,11 @@
-from typing import Iterator, Tuple, List, TypedDict, NamedTuple
-
-from apiclient.discovery import build
-
-
-class Playlist(NamedTuple):
-    title: str
-    id_: str
-
-
-class Thumbnail(TypedDict):
-    title: str
-    thumbnail_url: str
-
-
-class ThumbnailList(TypedDict):
-    title: str
-    videos: List[Thumbnail]
+from .repository import YouTubeAPIRepository
+from .models import Playlist, Thumbnail, ThumbnailList
+from typing import Tuple, List, Iterator
 
 
 class YoutubeAPIUtil:
-    def __init__(self, api_key):
-        self.youtube_api_key = api_key
-
-    def _get_resource_from_api(self, resource):
-        with build("youtube", "v3", developerKey=self.youtube_api_key) as youbute:
-            if resource["mode"] == "get_channel_id":
-                search_response = (
-                    youbute.search()
-                    .list(
-                        part="snippet",
-                        q=resource["channel_name"],
-                        type="channel",
-                        maxResults=2,
-                    )
-                    .execute()
-                )
-            elif resource["mode"] == "get_playlists_on_channel":
-                search_response = (
-                    youbute.search()
-                    .list(
-                        part="snippet",
-                        channelId=resource["channel_id"],
-                        type="playlist",
-                        order="videoCount",
-                        pageToken=resource["next_token"],
-                    )
-                    .execute()
-                )
-            elif resource["mode"] == "generate_thumbnail_list":
-                search_response = (
-                    youbute.playlistItems()
-                    .list(
-                        part="snippet",
-                        playlistId=resource["playlist_id"],
-                        pageToken=resource["next_token"],
-                    )
-                    .execute()
-                )
-        return search_response
+    def __init__(self, api_repo: YouTubeAPIRepository):
+        self.api_repo = api_repo
 
     def get_channel_id_from_channel_name(self, channel_name: str) -> str:
         """チャンネル名からチャンネルIDを取得する
@@ -69,7 +17,7 @@ class YoutubeAPIUtil:
             str: チャンネルID
         """
         resource = {"mode": "get_channel_id", "channel_name": channel_name}
-        search_response = self._get_resource_from_api(resource)
+        search_response = self.api_repo._get_resource_from_api(resource)
         for item in search_response["items"]:
             title = item["snippet"]["title"]
             if title == channel_name:
@@ -93,7 +41,7 @@ class YoutubeAPIUtil:
             "channel_id": channel_id,
             "next_token": next_token,
         }
-        search_response = self._get_resource_from_api(resource)
+        search_response = self.api_repo._get_resource_from_api(resource)
 
         next_token = search_response.get("nextPageToken")
         playlists = [
@@ -143,7 +91,7 @@ class YoutubeAPIUtil:
             "playlist_id": playlist_id,
             "next_token": next_token,
         }
-        search_response = self._get_resource_from_api(resource)
+        search_response = self.api_repo._get_resource_from_api(resource)
 
         next_token = search_response.get("nextPageToken")
         videos = [
