@@ -54,16 +54,18 @@ class YoutubeAPIUtil:
                 id_ = item["snippet"]["channelId"]
                 return id_
 
-    def get_playlists_on_channel(self, channel_id: str) -> Iterator[Playlist]:
-        """チャンネルに存在するプレイリスト（再生回数上位5つ）を取得
+    def _fetch_playlists_on_channel(
+        self, channel_id: str, next_token: str = ""
+    ) -> Tuple[str, List[Playlist]]:
+        """チャネル内のプレイリスト取得
 
         Args:
-            channel_id (str): チャンネルID
+            channel_id (str): チャネルID
+            next_token (str): YouTubeAPI 次ページ取得トークン
 
-        Yields:
-            Iterator[Playlist]: (プレイリストタイトル, プレイリストID)
+        Returns:
+            Tuple[str, List[Playlist]]: 次ページ取得トークン, プレイリスト[タイトル, ID]
         """
-
         with build("youtube", "v3", developerKey=self.youtube_api_key) as youbute:
             search_response = (
                 youbute.search()
@@ -72,17 +74,41 @@ class YoutubeAPIUtil:
                     channelId=channel_id,
                     type="playlist",
                     order="videoCount",
+                    pageToken=next_token,
                 )
                 .execute()
             )
 
-            for item in search_response["items"]:
-                title = item["snippet"]["title"]
-                id_ = item["id"]["playlistId"]
-                yield Playlist(title=title, id_=id_)
+            next_token = search_response.get("nextPageToken")
+            playlists = [
+                Playlist(title=item["snippet"]["title"], id_=item["id"]["playlistId"])
+                for item in search_response["items"]
+            ]
 
-    def _fetch_playlists(self):
-        pass
+            return next_token, playlists
+
+    def get_playlists_on_channel(self, channel_id: str) -> Iterator[Playlist]:
+        """チャンネルに存在するプレイリスト（再生回数上位5つ）を取得
+
+        Args:
+            channel_id (str): チャンネルID
+
+        Returns:
+            Iterator[Playlist]: (プレイリストタイトル, プレイリストID)
+        """
+
+        next_token, playlists = self._fetch_playlists_on_channel(channel_id)
+
+        while True:
+            if next_token is None:
+                break
+
+            next_token, tmp_plist = self._fetch_playlists_on_channel(
+                channel_id, next_token
+            )
+            playlists.extend(tmp_plist)
+
+        return playlists
 
     def generatet_playlists_thumbnail_list_on_channel(
         self, channel_id: str
