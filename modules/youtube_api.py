@@ -110,35 +110,6 @@ class YoutubeAPIUtil:
 
         return playlists
 
-    def generatet_playlists_thumbnail_list_on_channel(
-        self, channel_id: str
-    ) -> ThumbnailList:
-        """チャンネルに存在するプレイリストのサムネイルリストを作成
-
-        Args:
-            channel_id (str): チャンネルID
-
-        Yields:
-            Iterator[Playlist]: (プレイリストタイトル, プレイリストID)
-        """
-
-        with build("youtube", "v3", developerKey=self.youtube_api_key) as youbute:
-            search_response = (
-                youbute.search()
-                .list(
-                    part="snippet",
-                    channelId=channel_id,
-                    type="playlist",
-                    order="videoCount",
-                )
-                .execute()
-            )
-
-            for item in search_response["items"]:
-                title = item["snippet"]["title"]
-                id_ = item["id"]["playlistId"]
-                yield Playlist(title=title, id_=id_)
-
     def _fetch_playlist_items(
         self, playlist_id: str, next_token: str = ""
     ) -> Tuple[str, List[Thumbnail]]:
