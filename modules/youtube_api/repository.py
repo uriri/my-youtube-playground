@@ -5,7 +5,7 @@ from apiclient.discovery import build
 
 class YouTubeAPIRepository(ABC):
     @abstractmethod
-    def _get_resource_from_api(self, resource):
+    def _get_resource(self, resource):
         raise NotImplementedError
 
 
@@ -13,7 +13,7 @@ class YouTubeAPIRepositoryImpl(YouTubeAPIRepository):
     def __init__(self, api_key):
         self.youtube_api_key = api_key
 
-    def _get_resource_from_api(self, resource):
+    def _get_resource(self, resource):
         with build("youtube", "v3", developerKey=self.youtube_api_key) as youbute:
             if resource["mode"] == "get_channel_id":
                 search_response = (

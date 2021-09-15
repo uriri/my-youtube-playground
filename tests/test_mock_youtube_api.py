@@ -4,7 +4,7 @@ from modules.youtube_api import YoutubeAPIUtil, YouTubeAPIRepository
 
 
 class YouTubeAPIRepositoryMock(YouTubeAPIRepository):
-    def _get_resource_from_api(self, resource):
+    def _get_resource(self, resource):
         if resource["mode"] == "get_channel_id":
             return {
                 "items": [
@@ -25,7 +25,7 @@ class TestYoutubeAPI(unittest.TestCase):
     def test_mock_func(self):
         resource = {"mode": "get_channel_id", "channel_name": "Mock Channel"}
         api_factory = YouTubeAPIRepositoryMock()
-        actual = api_factory._get_resource_from_api(resource=resource)
+        actual = api_factory._get_resource(resource=resource)
         expected = {
             "items": [
                 {

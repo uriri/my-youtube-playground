@@ -17,7 +17,7 @@ class YoutubeAPIUtil:
             str: チャンネルID
         """
         resource = {"mode": "get_channel_id", "channel_name": channel_name}
-        search_response = self.api_repo._get_resource_from_api(resource)
+        search_response = self.api_repo._get_resource(resource)
         for item in search_response["items"]:
             title = item["snippet"]["title"]
             if title == channel_name:
@@ -41,7 +41,7 @@ class YoutubeAPIUtil:
             "channel_id": channel_id,
             "next_token": next_token,
         }
-        search_response = self.api_repo._get_resource_from_api(resource)
+        search_response = self.api_repo._get_resource(resource)
 
         next_token = search_response.get("nextPageToken")
         playlists = [
@@ -91,7 +91,7 @@ class YoutubeAPIUtil:
             "playlist_id": playlist_id,
             "next_token": next_token,
         }
-        search_response = self.api_repo._get_resource_from_api(resource)
+        search_response = self.api_repo._get_resource(resource)
 
         next_token = search_response.get("nextPageToken")
         videos = [
