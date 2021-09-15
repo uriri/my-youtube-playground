@@ -5,23 +5,25 @@ from modules.youtube_api import YoutubeAPIUtil
 
 
 def _get_resource_from_mock(cls, resource):
-    return {
-        "items": [
-            {
-                "snippet": {
-                    "title": "Mock Channel",
-                    "channelId": "abcdefg1234567",
-                },
-            }
-        ]
-    }
+    if resource["mode"] == "get_channel_id":
+        return {
+            "items": [
+                {
+                    "snippet": {
+                        "title": resource["channel_name"],
+                        "channelId": "abcdefg1234567",
+                    },
+                }
+            ]
+        }
 
 
 @patch.object(YoutubeAPIUtil, "_get_resource_from_api", new=_get_resource_from_mock)
 class TestYoutubeAPI(unittest.TestCase):
-    def test_func(self):
+    def test_mock_func(self):
         youtube_api_util = YoutubeAPIUtil(api_key="")
-        actual = youtube_api_util._get_resource_from_api(resource={})
+        resource = {"mode": "get_channel_id", "channel_name": "Mock Channel"}
+        actual = youtube_api_util._get_resource_from_api(resource=resource)
         expected = {
             "items": [
                 {
