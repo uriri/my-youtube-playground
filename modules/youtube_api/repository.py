@@ -28,12 +28,10 @@ class YouTubeAPIRepositoryImpl(YouTubeAPIRepository):
                 )
             elif resource["mode"] == "get_playlists_on_channel":
                 search_response = (
-                    youbute.search()
+                    youbute.playlists()
                     .list(
                         part="snippet",
                         channelId=resource["channel_id"],
-                        type="playlist",
-                        order="videoCount",
                         pageToken=resource["next_token"],
                     )
                     .execute()

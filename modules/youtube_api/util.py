@@ -47,14 +47,14 @@ class YoutubeAPIUtil:
 
         next_token = search_response.get("nextPageToken")
         playlists = [
-            Playlist(title=item["snippet"]["title"], id_=item["id"]["playlistId"])
+            Playlist(title=item["snippet"]["title"], id_=item["id"])
             for item in search_response["items"]
         ]
 
         return next_token, playlists
 
     def get_playlists_on_channel(self, channel_id: str) -> Iterator[Playlist]:
-        """チャンネルに存在するプレイリスト（再生回数上位5つ）を取得
+        """チャンネルに存在するプレイリストを全件取得
 
         Args:
             channel_id (str): チャンネルID
