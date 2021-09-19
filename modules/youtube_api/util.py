@@ -95,10 +95,10 @@ class YoutubeAPIUtil:
 
         next_token = search_response.get("nextPageToken")
         videos = [
-            {
-                "title": video["snippet"]["title"],
-                "thumbnail_url": video["snippet"]["thumbnails"]["standard"]["url"],
-            }
+            Thumbnail(
+                title=video["snippet"]["title"],
+                thumbnail_url=video["snippet"]["thumbnails"]["standard"]["url"],
+            )
             for video in search_response["items"]
         ]
 
@@ -124,6 +124,6 @@ class YoutubeAPIUtil:
             )
             videos.extend(tmp_videos)
 
-        thumbnail_list: ThumbnailList = {"title": playlist.title, "videos": videos}
+        thumbnail_list = ThumbnailList(title=playlist.title, videos=videos)
 
         return thumbnail_list

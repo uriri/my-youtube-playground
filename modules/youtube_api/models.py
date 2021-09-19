@@ -1,4 +1,4 @@
-from typing import List, TypedDict, NamedTuple
+from typing import List, NamedTuple
 
 
 class Playlist(NamedTuple):
@@ -6,11 +6,11 @@ class Playlist(NamedTuple):
     id_: str
 
 
-class Thumbnail(TypedDict):
+class Thumbnail(NamedTuple):
     title: str
     thumbnail_url: str
 
 
-class ThumbnailList(TypedDict):
+class ThumbnailList(NamedTuple):
     title: str
     videos: List[Thumbnail]

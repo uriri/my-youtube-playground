@@ -1,6 +1,8 @@
 import unittest
 
-from modules.youtube_api import Playlist, YoutubeAPIUtil, YouTubeAPIRepository
+from modules.youtube_api.models import Playlist, Thumbnail, ThumbnailList
+from modules.youtube_api.util import YoutubeAPIUtil
+from modules.youtube_api.repository import YouTubeAPIRepository
 
 
 class YouTubeAPIRepositoryMock(YouTubeAPIRepository):
@@ -119,25 +121,13 @@ class TestYoutubeAPI(unittest.TestCase):
         """プレイリスト内の動画サムネイルURLリストを作成するテスト"""
         playlist = Playlist(title="playlist1", id_="id1")
         actual = self.youtube_api_util.generate_thumbnail_list(playlist=playlist)
-        expected = {
-            "title": "playlist1",
-            "videos": [
-                {
-                    "title": "title1",
-                    "thumbnail_url": "url1",
-                },
-                {
-                    "title": "title2",
-                    "thumbnail_url": "url2",
-                },
-                {
-                    "title": "title3",
-                    "thumbnail_url": "url3",
-                },
-                {
-                    "title": "title4",
-                    "thumbnail_url": "url4",
-                },
+        expected = ThumbnailList(
+            title="playlist1",
+            videos=[
+                Thumbnail(title="title1", thumbnail_url="url1"),
+                Thumbnail(title="title2", thumbnail_url="url2"),
+                Thumbnail(title="title3", thumbnail_url="url3"),
+                Thumbnail(title="title4", thumbnail_url="url4"),
             ],
-        }
+        )
         self.assertEqual(actual, expected)
