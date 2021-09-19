@@ -2,6 +2,8 @@ from pathlib import Path
 import urllib.error
 import urllib.request
 
+from modules.models import ThumbnailList
+
 
 def delete_unused_char_for_dir_name(origin_str: str) -> str:
     """Windowsディレクトリ名で使用できない文字を_に変換する
@@ -29,7 +31,7 @@ def delete_unused_char_for_dir_name(origin_str: str) -> str:
     )
 
 
-def download_thumbnails(base_path: Path, download_list) -> None:
+def download_thumbnails(base_path: Path, download_list: ThumbnailList) -> None:
     playlist_name = download_list["title"]
     save_dir = base_path / delete_unused_char_for_dir_name(playlist_name)
     save_dir.mkdir()

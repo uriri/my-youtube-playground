@@ -1,8 +1,8 @@
 import unittest
 
-from modules.youtube_api.models import Playlist, Thumbnail, ThumbnailList
-from modules.youtube_api.util import YoutubeAPIUtil
+from modules.models import Playlist, Thumbnail, ThumbnailList
 from modules.youtube_api.repository import YouTubeAPIRepository
+from modules.youtube_api.util import YoutubeAPIUtil
 
 
 class YouTubeAPIRepositoryMock(YouTubeAPIRepository):

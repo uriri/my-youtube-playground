@@ -1,6 +1,8 @@
+from typing import Iterator, List, Tuple
+
+from modules.models import Playlist, Thumbnail, ThumbnailList
+
 from .repository import YouTubeAPIRepository
-from .models import Playlist, Thumbnail, ThumbnailList
-from typing import Tuple, List, Iterator
 
 
 class YoutubeAPIUtil:
