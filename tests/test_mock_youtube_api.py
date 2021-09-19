@@ -24,11 +24,11 @@ class YouTubeAPIRepositoryMock(YouTubeAPIRepository):
                     "nextPageToken": "ABC",
                     "items": [
                         {
+                            "id": f"id{x}",
                             "snippet": {
                                 "title": f"playlist{x}",
                                 "channelId": resource["channel_id"],
                             },
-                            "id": {"playlistId": f"id{x}"},
                         }
                         for x in range(1, 4)
                     ],
@@ -37,11 +37,11 @@ class YouTubeAPIRepositoryMock(YouTubeAPIRepository):
                 return {
                     "items": [
                         {
+                            "id": "id4",
                             "snippet": {
                                 "title": "playlist4",
                                 "channelId": resource["channel_id"],
                             },
-                            "id": {"playlistId": "id4"},
                         }
                     ]
                 }
