@@ -1,8 +1,16 @@
-from pathlib import Path
+import json
 import urllib.error
 import urllib.request
+from pathlib import Path
 
 from modules.models import ThumbnailList
+
+
+def get_api_key_from_config():
+
+    with open("secrets/api_key.json", "r", encoding="utf-8") as f:
+        conf = json.load(f)
+    return conf
 
 
 def delete_unused_char_for_dir_name(origin_str: str) -> str:
