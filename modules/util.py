@@ -8,7 +8,7 @@ from modules.models import ThumbnailList
 
 def get_api_key_from_config():
 
-    with open("secrets/api_key.json", "r", encoding="utf-8") as f:
+    with open("config/api_key.json", "r", encoding="utf-8") as f:
         conf = json.load(f)
     return conf
 
