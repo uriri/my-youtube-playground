@@ -8,7 +8,7 @@ class SaveThumbnailService:
     def __init__(self, youtube_api_repo: YouTubeAPIRepository):
         self.youtube_api_util = YoutubeAPIUtil(api_repo=youtube_api_repo)
 
-    def save_thumbnails_to_files(self, channel_name: str, base_path: Path):
+    def save_thumbnails_group_by_playlist(self, channel_name: str, base_path: Path):
         channel_id = self.youtube_api_util.get_channel_id_from_channel_name(
             channel_name=channel_name
         )
