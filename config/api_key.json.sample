@@ -1,3 +1,7 @@
 {
-    "youtube_data_v3": "example"
+    "youtube_data_v3": "example",
+    "download_thumbnail": {
+        "channel_name": "example channel",
+        "save_dst_dir": "C:\\"
+    }
 }
