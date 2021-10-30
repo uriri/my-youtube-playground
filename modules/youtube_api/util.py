@@ -99,7 +99,7 @@ class YoutubeAPIUtil:
         videos = [
             Thumbnail(
                 title=video["snippet"]["title"],
-                thumbnail_url=video["snippet"]["thumbnails"]["standard"]["url"],
+                thumbnail_url=video["snippet"]["thumbnails"]["default"]["url"],
             )
             for video in search_response["items"]
         ]
