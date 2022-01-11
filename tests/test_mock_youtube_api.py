@@ -53,7 +53,7 @@ class YouTubeAPIRepositoryMock(YouTubeAPIRepository):
                         {
                             "snippet": {
                                 "title": f"title{x}",
-                                "thumbnails": {"standard": {"url": f"url{x}"}},
+                                "thumbnails": {"default": {"url": f"url{x}"}},
                             },
                         }
                         for x in range(1, 4)
@@ -65,7 +65,7 @@ class YouTubeAPIRepositoryMock(YouTubeAPIRepository):
                         {
                             "snippet": {
                                 "title": "title4",
-                                "thumbnails": {"standard": {"url": "url4"}},
+                                "thumbnails": {"default": {"url": "url4"}},
                             },
                         }
                     ],
