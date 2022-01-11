@@ -12,10 +12,12 @@ class SaveThumbnailService:
         channel_id = self.youtube_api_util.get_channel_id_from_channel_name(
             channel_name=channel_name
         )
+        print(f"channel_id: {channel_id}")
         playlists = self.youtube_api_util.get_playlists_on_channel(
             channel_id=channel_id
         )
         for playlist in playlists:
+            print(f"{playlist.title}: {playlist.id_}")
             download_list = self.youtube_api_util.generate_thumbnail_list(
                 playlist=playlist
             )
